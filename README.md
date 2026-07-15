@@ -1,3 +1,4 @@
+ROU & ENG <br>
 <img width="630" height="235" alt="Image" src="https://github.com/user-attachments/assets/0a61d874-a24b-4102-a901-4aabfb14d9a6" /> <br>
 Acesta este meniul care vă întâmpină atunci când rulați codul. Puteți alege opțiunea pe care o doriți tastând 1, 2, respectiv 3 și apăsând Enter. <br>
 This is the interface that welcomes you when you first run the code. You can pick between the options by pressing 1,2 or 3 and Enter.<br>
@@ -11,4 +12,7 @@ Aplicația include de asemenea si un tutorial simplu, pentru a ajuta jucătorii 
 The app also includes a simple tutorial in Romanian which teaches the players how the pieces move and how to move their pieces using notation.
 <br> <br>
 Cum funcționează codul? El citește pătrățelul la care vreți să mutați, spre exemplu f3, și piesa pe care vreți să o mutați, spre exemplu R, de la Rook (tură). Mutarea ar fi Rf3. Codul caută toate turele care pot ajunge la acel pătrățel, pe linia 3 sau coloana f, având culoarea jucătorului care e la rând. Dacă există o tură care să poată ajunge acolo, mutarea se efectuează. <br>
-What does the code do? It reads your move input, finds the square you want to move to, for example f3, and the piece you want to move there, for example the rook. The move would be Rf3. The code searches for rooks of the right color on the f line and 3rd column and if there is one that can go there, the move is made.
+What does the code do? It reads your move input, finds the square you want to move to, for example f3, and the piece you want to move there, for example the rook. The move would be Rf3. The code searches for rooks of the right color on the f line and 3rd column and if there is one that can go there, the move is made. <br> <br>
+Sunteți invitați să încercați și dvs. să jucați. Distracție plăcută! <br>
+You are welcome to try it out yourself. Have fun! <br>
+♟️🐈
