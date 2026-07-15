@@ -1,0 +1,2205 @@
+#include <iostream>
+#include <cstring>
+#include <algorithm>
+#include <math.h>
+#include <stdlib.h>
+#include <conio.h>
+using namespace std;
+
+
+int a[9][9]= {0}, mat[9][9]= {0};
+char NumeAlb[100], NumeNegru[100];
+int Randul=2, Schimb1=1;
+bool SahMat=false;
+char mutare[10];
+int CVSM;
+char MutarileFacute[700];
+char Memorare[40];
+int lungime;
+
+
+int PiesaPinned(int c, int b);
+int SuntInSah(int c,int b);
+void AdaugareMutari();
+void AfisareMutari();
+void AfisareTabla();
+void CitireMutare();
+void Start();
+void Reguli();
+void Credite();
+void JocNou();
+
+
+
+
+int PiesaInNr()
+{
+    int PC;
+    PC=10*Randul;
+    if(mutare[0]=='N')
+        PC+=2;
+    else if(mutare[0]=='B')
+        PC+=3;
+    else if(mutare[0]=='R')
+        PC+=4;
+    else if(mutare[0]=='Q')
+        PC+=5;
+    else if(mutare[0]=='K')
+        PC+=6;
+    else if(mutare[0]>='a'&&mutare[0]<='h')
+        PC++;
+    if(strchr(mutare,'=')!=NULL)
+        PC+=6; //pentru promovare 7
+    if(mutare[0]=='O')
+        PC+=8; //rocada
+    return PC;
+}
+
+
+int xK,yK;
+void UndeMiRegele(int p)
+{
+    for(int i=1; i<=8; i++)
+        for(int j=1; j<=8; j++)
+            if(a[i][j]==p)
+                xK=i,yK=j;
+}
+
+
+int croco=0;
+void AdaugareMutari()
+{
+
+
+
+
+    if(Randul==1) //rand White
+    {
+        MutarileFacute[croco]='.',croco++;
+        strcat(MutarileFacute,mutare), croco+=strlen(mutare);
+        MutarileFacute[croco]=' ', croco++;
+    }
+    if(Randul==2) //rand Black
+    {
+        strcat(MutarileFacute,mutare), croco+=strlen(mutare);
+        MutarileFacute[croco]=' ', croco++;
+    }
+
+
+
+
+}
+void AfisareMutari()
+{
+    int gog=1;
+    cout<<"  ";
+    for(int jojo=0; jojo<=croco; jojo++)
+    {
+        if(gog%16==0 && MutarileFacute[jojo]=='.')
+            cout<<endl<<"  "<<gog<<MutarileFacute[jojo],gog++;
+        else if(MutarileFacute[jojo]=='.')
+            cout<<gog<<MutarileFacute[jojo],gog++;
+        else cout<<MutarileFacute[jojo];
+    }
+}
+
+
+
+
+void PrelucrareMutare()
+{
+    if(mutare[strlen(mutare)-1]=='+'||mutare[strlen(mutare)-1]=='#')
+        mutare[strlen(mutare)-1]='\0'; //pentru stergerea + sau # de la finalul mutarii
+}
+
+
+void Promovare()
+{
+    if(strchr(mutare,'x')!=NULL) ///capturare + promovare
+    {
+        if(Randul==1) //rand White
+        {
+            a[2][mutare[0]-'a'+1]=0;
+            a[1][mutare[2]-'a'+1]=10;
+
+
+            if(mutare[5]=='N')
+                a[1][mutare[2]-'a'+1]+=2;
+            if(mutare[5]=='B')
+                a[1][mutare[2]-'a'+1]+=3;
+            if(mutare[5]=='R')
+                a[1][mutare[2]-'a'+1]+=4;
+            if(mutare[5]=='Q')
+                a[1][mutare[2]-'a'+1]+=5;
+        }
+        if(Randul==2) //rand Black
+        {
+            a[7][mutare[0]-'a'+1]=0;
+            a[8][mutare[2]-'a'+1]=20;
+
+
+            if(mutare[5]=='N')
+                a[8][mutare[2]-'a'+1]+=2;
+            if(mutare[5]=='B')
+                a[8][mutare[2]-'a'+1]+=3;
+            if(mutare[5]=='R')
+                a[8][mutare[2]-'a'+1]+=4;
+            if(mutare[5]=='Q')
+                a[8][mutare[2]-'a'+1]+=5;
+        }
+    }
+
+
+    else   ///doar promovare
+    {
+        if(Randul==1) //rand White
+        {
+            a[2][mutare[0]-'a'+1]=0;
+            a[1][mutare[0]-'a'+1]=10;
+
+
+            if(mutare[3]=='N')
+                a[1][mutare[0]-'a'+1]+=2;
+            if(mutare[3]=='B')
+                a[1][mutare[0]-'a'+1]+=3;
+            if(mutare[3]=='R')
+                a[1][mutare[0]-'a'+1]+=4;
+            if(mutare[3]=='Q')
+                a[1][mutare[0]-'a'+1]+=5;
+        }
+        if(Randul==2) //rand Black
+        {
+            a[7][mutare[0]-'a'+1]=0;
+            a[8][mutare[0]-'a'+1]=20;
+
+
+            if(mutare[3]=='N')
+                a[8][mutare[0]-'a'+1]+=2;
+            if(mutare[3]=='B')
+                a[8][mutare[0]-'a'+1]+=3;
+            if(mutare[3]=='R')
+                a[8][mutare[0]-'a'+1]+=4;
+            if(mutare[3]=='Q')
+                a[8][mutare[0]-'a'+1]+=5;
+        }
+    }
+}
+
+
+void MutarePion()
+{
+    if(strchr(mutare,'x')!=NULL)  ///capturare
+    {
+        if(Randul==2)  //rand Black
+        {
+            a[9-(mutare[3]-'0')-1][mutare[0]-'a'+1]=0;
+            a[9-(mutare[3]-'0')][mutare[2]-'a'+1]=21;
+        }
+        if(Randul==1)  //rand White
+        {
+            a[9-(mutare[3]-'0')+1][mutare[0]-'a'+1]=0;
+            a[9-(mutare[3]-'0')][mutare[2]-'a'+1]=11;
+        }
+    }
+    else
+    {
+        if(Randul==1)  //rand White
+        {
+            if(a[10-(mutare[1]-'0')][mutare[0]-'a'+1]==11)  ///avans 1 patratel
+                a[10-(mutare[1]-'0')][mutare[0]-'a'+1]=0,
+                                                       a[9-(mutare[1]-'0')][mutare[0]-'a'+1]=11;
+
+
+            else if(a[11-(mutare[1]-'0')][mutare[0]-'a'+1]==11)  ///2 patratele
+                a[11-(mutare[1]-'0')][mutare[0]-'a'+1]=0,
+                                                       a[9-(mutare[1]-'0')][mutare[0]-'a'+1]=11;
+        }
+        if(Randul==2)  //rand Black
+        {
+            if(a[8-(mutare[1]-'0')][mutare[0]-'a'+1]==21)
+                a[8-(mutare[1]-'0')][mutare[0]-'a'+1]=0,
+                                                      a[9-(mutare[1]-'0')][mutare[0]-'a'+1]=21;
+
+
+            else if(a[7-(mutare[1]-'0')][mutare[0]-'a'+1]==21)
+                a[7-(mutare[1]-'0')][mutare[0]-'a'+1]=0,
+                                                      a[9-(mutare[1]-'0')][mutare[0]-'a'+1]=21;
+        }
+    }
+}
+
+
+
+
+int OaspeteleCal(int c, int b,int p)  ///Oaspetele care viziteaza toate patratele care
+{
+    /// pot ajunge la patratul cautat, in forma de 'L'
+
+
+    int i=0,CatiCai=0;                 //la final vom avea nr de cai care pot ajunge la patratul ales si patratele pe care se afla acestia
+    c-=2,b--;
+    if(c>0&c<9 & b>0&b<9)              //un patrat trebuie sa aiba ambele coordonate
+        if(a[c][b]==p)                  // intre 1 si 8 ca sa fie valid
+            CatiCai++,Memorare[i++]=char(b-1+'a'),Memorare[i++]=char(9-c+'0');
+    b+=2;
+    if(c>0&c<9 & b>0&b<9)
+        if(a[c][b]==p)
+            CatiCai++,Memorare[i++]=char(b-1+'a'),Memorare[i++]=char(9-c+'0');
+    c++,b++;
+    if(c>0&c<9 & b>0&b<9)
+        if(a[c][b]==p)
+            CatiCai++,Memorare[i++]=char(b-1+'a'),Memorare[i++]=char(9-c+'0');
+    c+=2;
+    if(c>0&c<9 & b>0&b<9)
+        if(a[c][b]==p)
+            CatiCai++,Memorare[i++]=char(b-1+'a'),Memorare[i++]=char(9-c+'0');
+    c++,b--;
+    if(c>0&c<9 & b>0&b<9)
+        if(a[c][b]==p)
+            CatiCai++,Memorare[i++]=char(b-1+'a'),Memorare[i++]=char(9-c+'0');
+    b-=2;
+    if(c>0&c<9 & b>0&b<9)
+        if(a[c][b]==p)
+            CatiCai++,Memorare[i++]=char(b-1+'a'),Memorare[i++]=char(9-c+'0');
+    c--,b--;
+    if(c>0&c<9 & b>0&b<9)
+        if(a[c][b]==p)
+            CatiCai++,Memorare[i++]=char(b-1+'a'),Memorare[i++]=char(9-c+'0');
+    c-=2;
+    if(c>0&c<9 & b>0&b<9)
+        if(a[c][b]==p)
+            CatiCai++,Memorare[i++]=char(b-1+'a'),Memorare[i++]=char(9-c+'0');
+
+
+    return CatiCai;
+
+
+}
+
+
+
+
+int OaspeteleNebun(int c, int b, int p)
+{
+    int CatiNebuni=0,i=0,e=c,d=b;
+
+
+    c--,b--;
+    while(a[c][b]==0 && c>1 && b>1)
+        c--,b--;
+    if(a[c][b]==p)
+        CatiNebuni++,Memorare[i++]=char(b-1+'a'),Memorare[i++]=char(9-c+'0');
+    c=e,b=d;
+
+
+    c--,b++;
+    while(a[c][b]==0 && c>1 && b<8)
+        c--,b++;
+    if(a[c][b]==p)
+        CatiNebuni++,Memorare[i++]=char(b-1+'a'),Memorare[i++]=char(9-c+'0');
+    c=e,b=d;
+
+
+    c++,b--;
+    while(a[c][b]==0 && c<8 && b>1)
+        c++,b--;
+    if(a[c][b]==p)
+        CatiNebuni++,Memorare[i++]=char(b-1+'a'),Memorare[i++]=char(9-c+'0');
+    c=e,b=d;
+
+
+    c++,b++;
+    while(a[c][b]==0 && c<8 && b<8)
+        c++,b++;
+    if(a[c][b]==p)
+        CatiNebuni++,Memorare[i++]=char(b-1+'a'),Memorare[i++]=char(9-c+'0');
+
+
+    return CatiNebuni;
+}
+
+
+
+
+int OaspeteleTura(int c, int b, int p)
+{
+    int CateTure=0,i=0,e=c,d=b;
+
+
+    c--;
+    while(a[c][b]==0 && c>1)
+        c--;
+    if(a[c][b]==p)
+        CateTure++,Memorare[i++]=char(b-1+'a'),Memorare[i++]=char(9-c+'0');
+    c=e,b=d;
+
+
+    b--;
+    while(a[c][b]==0 && b>1)
+        b--;
+    if(a[c][b]==p)
+        CateTure++,Memorare[i++]=char(b-1+'a'),Memorare[i++]=char(9-c+'0');
+    c=e,b=d;
+
+
+    b++;
+    while(a[c][b]==0 && b<8)
+        b++;
+    if(a[c][b]==p)
+        CateTure++,Memorare[i++]=char(b-1+'a'),Memorare[i++]=char(9-c+'0');
+    c=e,b=d;
+
+
+    c++;
+    while(a[c][b]==0 && c<8)
+        c++;
+    if(a[c][b]==p)
+        CateTure++,Memorare[i++]=char(b-1+'a'),Memorare[i++]=char(9-c+'0');
+
+
+    return CateTure;
+}
+
+
+int OaspeteleRege(int c, int b, int p)
+{
+    c--;
+    if(a[c][b]==p & c>0&c<9 & b>0&b<9)
+    {
+        Memorare[0]=char(b-1+'a'),Memorare[1]=char(9-c+'0');
+        return 1;
+    }
+
+
+    b++;
+    if(a[c][b]==p & c>0&c<9 & b>0&b<9)
+    {
+        Memorare[0]=char(b-1+'a'),Memorare[1]=char(9-c+'0');
+        return 1;
+    }
+
+
+    c++;
+    if(a[c][b]==p & c>0&c<9 & b>0&b<9)
+    {
+        Memorare[0]=char(b-1+'a'),Memorare[1]=char(9-c+'0');
+        return 1;
+    }
+
+
+    c++;
+    if(a[c][b]==p & c>0&c<9 & b>0&b<9)
+    {
+        Memorare[0]=char(b-1+'a'),Memorare[1]=char(9-c+'0');
+        return 1;
+    }
+
+
+    b--;
+    if(a[c][b]==p & c>0&c<9 & b>0&b<9)
+    {
+        Memorare[0]=char(b-1+'a'),Memorare[1]=char(9-c+'0');
+        return 1;
+    }
+
+
+    b--;
+    if(a[c][b]==p & c>0&c<9 & b>0&b<9)
+    {
+        Memorare[0]=char(b-1+'a'),Memorare[1]=char(9-c+'0');
+        return 1;
+    }
+
+
+    c--;
+    if(a[c][b]==p & c>0&c<9 & b>0&b<9)
+    {
+        Memorare[0]=char(b-1+'a'),Memorare[1]=char(9-c+'0');
+        return 1;
+    }
+
+
+    c--;
+    if(a[c][b]==p & c>0&c<9 & b>0&b<9)
+    {
+        Memorare[0]=char(b-1+'a'),Memorare[1]=char(9-c+'0');
+        return 1;
+    }
+
+
+    return 0;
+}
+
+
+int mKa=0,mKn=0;
+int mRSa=0,mRDa=0,mRSn=0,mRDn=0;
+void Rocada()
+{
+    if(Randul==1)
+    {
+        a[8][5]=0;
+        if(strlen(mutare)==5)
+            a[8][3]=16,a[8][4]=14,a[8][1]=0,mKa=1;
+        if(strlen(mutare)==3)
+            a[8][7]=16,a[8][6]=14,a[8][8]=0,mKa=1;
+    }
+    if(Randul==2)
+    {
+        a[1][5]=0;
+        if(strlen(mutare)==5)
+            a[1][3]=26,a[1][4]=24,a[1][1]=0,mKn=1;
+        if(strlen(mutare)==3)
+            a[1][7]=26,a[1][6]=24,a[1][8]=0,mKn=1;
+    }
+}
+
+
+void FaMutarea()
+{
+    if(strchr(mutare,'x')!=NULL) ///capturare
+    {
+        if(lungime==4)
+        {
+            a[9-(Memorare[1]-'0')][Memorare[0]-'a'+1]=0;
+            a[9-(mutare[3]-'0')][mutare[2]-'a'+1]=CVSM;
+        }
+
+
+        if(lungime==5)
+        {
+            int temp;
+
+
+            if(mutare[1]>='a'&&mutare[1]<='h')
+            {
+                for(int i=0; i<strlen(Memorare); i++)
+                    if(Memorare[i]==mutare[1])
+                        temp=Memorare[i+1];
+                a[9-(temp-'0')][mutare[1]-'a'+1]=0;
+            }
+            if(mutare[1]>='1'&&mutare[1]<='8')
+            {
+                for(int i=0; i<strlen(Memorare); i++)
+                    if(Memorare[i]==mutare[1])
+                        temp=Memorare[i-1];
+                a[9-(mutare[1]-'0')][temp-'a'+1]=0;
+            }
+            a[9-(mutare[4]-'0')][mutare[3]-'a'+1]=CVSM;
+        }
+
+
+        if(lungime==6)
+        {
+            a[9-(mutare[2]-'0')][mutare[1]-'a'+1]=0;
+            a[9-(mutare[5]-'0')][mutare[4]-'a'+1]=CVSM;
+        }
+    }
+
+
+    else  ///doar mutare
+    {
+        if(lungime==3)
+        {
+            a[9-(Memorare[1]-'0')][Memorare[0]-'a'+1]=0;
+            a[9-(mutare[2]-'0')][mutare[1]-'a'+1]=CVSM;
+        }
+
+
+        if(lungime==4)
+        {
+            int temp;
+            if(mutare[1]>='a'&&mutare[1]<='h')
+            {
+                for(int i=0; i<strlen(Memorare); i++)
+                    if(Memorare[i]==mutare[1])
+                        temp=Memorare[i+1];
+                a[9-(temp-'0')][mutare[1]-'a'+1]=0;
+            }
+            if(mutare[1]>='1'&&mutare[1]<='8')
+            {
+                for(int i=0; i<strlen(Memorare); i++)
+                    if(Memorare[i]==mutare[1])
+                        temp=Memorare[i-1];
+                a[9-(mutare[1]-'0')][temp-'a'+1]=0;
+            }
+            a[9-(mutare[3]-'0')][mutare[2]-'a'+1]=CVSM;
+        }
+
+
+        if(lungime==5)
+        {
+            a[9-(mutare[2]-'0')][mutare[1]-'a'+1]=0;
+            a[9-(mutare[4]-'0')][mutare[3]-'a'+1]=CVSM;
+        }
+    }
+    memset(Memorare, 0, strlen(Memorare));
+    if(CVSM%10==6)
+    {
+        if(Randul==1)
+            mKa=1;
+        if(Randul==2)
+            mKn=1;
+    }
+    if(mKn==0)
+    {
+        if(a[1][1]!=24)
+            mRSn=1;
+        if(a[1][8]!=24)
+            mRDn=1;
+    }
+    if(mKa==0)
+    {
+        if(a[8][1]!=14)
+            mRSa=1;
+        if(a[8][8]!=14)
+            mRDa=1;
+    }
+}
+
+
+void MutariImpartire()
+{
+    CVSM=PiesaInNr(); //ce vrea sa mutam
+    lungime=strlen(mutare);
+    int x=9-(mutare[lungime-1]-'0');
+    int y=mutare[lungime-2]-'a'+1;
+
+
+
+
+    if(CVSM%10==1)
+        MutarePion();
+    else if(CVSM%10==2)
+    {
+        OaspeteleCal(x,y,CVSM);
+        FaMutarea();
+    }
+    else if(CVSM%10==3)
+    {
+        OaspeteleNebun(x,y,CVSM);
+        FaMutarea();
+    }
+    else if(CVSM%10==4)
+    {
+        OaspeteleTura(x,y,CVSM);
+        FaMutarea();
+    }
+    else if(CVSM%10==5)
+    {
+        OaspeteleNebun(x,y,CVSM);
+        OaspeteleTura(x,y,CVSM);
+        FaMutarea();
+    }
+    else if(CVSM%10==6)
+    {
+        OaspeteleRege(x,y,CVSM);
+        FaMutarea();
+    }
+    else if(CVSM%10==7)
+        Promovare();
+    else if(CVSM%10==8)
+        Rocada();
+
+
+
+
+
+
+
+
+}
+
+
+char* NumarPiesaInPiesa(int n)
+{
+    char* s;
+    if(n==11)
+    {
+        s="wP";
+        return s;
+    }
+    if(n==12)
+    {
+        s="wN";
+        return s;
+    }
+    if(n==13)
+    {
+        s="wB";
+        return s;
+    }
+    if(n==14)
+    {
+        s="wR";
+        return s;
+    }
+    if(n==15)
+    {
+        s="wQ";
+        return s;
+    }
+    if(n==16)
+    {
+        s="wK";
+        return s;
+    }
+    if(n==21)
+    {
+        s="bP";
+        return s;
+    }
+    if(n==22)
+    {
+        s="bN";
+        return s;
+    }
+    if(n==23)
+    {
+        s="bB";
+        return s;
+    }
+    if(n==24)
+    {
+        s="bR";
+        return s;
+    }
+    if(n==25)
+    {
+        s="bQ";
+        return s;
+    }
+    if(n==26)
+    {
+        s="bK";
+        return s;
+    }
+    if(n==70)
+    {
+        s="XX";
+        return s;
+    }
+}
+
+
+
+
+void EsteRandul()
+{
+    swap(Randul,Schimb1);
+    if(Randul==1)
+        cout<<"  Alb ("<<NumeAlb<<") la mutare: ";
+    else cout<<"  Negru ("<<NumeNegru<<") la mutare: ";
+    //1 = Alb, 2 = Negru
+}
+
+
+
+
+void NumeleVoastre()
+{
+    cout<<endl<<"   Numele jucatorului ALB: ";
+    cin>>NumeAlb;
+    cout<<endl<<"   Alb --> "<<NumeAlb<<endl;
+    getch();
+    cout<<endl<<"   Numele jucatorului NEGRU: ";
+    cin>>NumeNegru;
+    cout<<endl<<"   Negru --> "<<NumeNegru;
+    getch();
+
+
+}
+
+
+
+
+void AfisareTabla()
+{
+#define CS char(219)
+    cout<<endl;
+    for(int i=1; i<=28-strlen(NumeAlb); i++)
+        cout<<" ";
+    cout<<NumeAlb<<" vs "<<NumeNegru<<endl<<endl;
+    for(int i=1; i<=8; i++)
+    {
+        cout<<"      ";
+        for(int j=1; j<=8; j++)
+            if((i+j)%2==1)
+                cout<<CS<<CS<<CS<<CS<<CS<<CS;
+            else cout<<"      ";
+
+
+        cout<<endl;
+        cout<<"  "<<9-i<<"   ";
+
+
+        for(int j=1; j<=8; j++)
+        {
+            if(a[i][j]==0)
+                if((i+j)%2==1)
+                    cout<<CS<<CS<<CS<<CS<<CS<<CS;
+                else cout<<"      ";
+
+
+            if(a[i][j]!=0)
+                if((i+j)%2==1)
+                    cout<<CS<<CS<<NumarPiesaInPiesa(a[i][j])<<CS<<CS;
+                else cout<<"  "<<NumarPiesaInPiesa(a[i][j])<<"  ";
+        }
+
+
+        cout<<endl;
+        cout<<"      ";
+
+
+        for(int j=1; j<=8; j++)
+            if((i+j)%2==1)
+                cout<<CS<<CS<<CS<<CS<<CS<<CS;
+            else cout<<"      ";
+
+
+        cout<<endl;
+    }
+    cout<<endl<<"        a     b     c     d     e     f     g     h";
+}
+
+
+
+
+void InitializareTabla()
+{
+    /* WHITE PAWN=11, BLACK PAWN=21
+       W   KNIGHT=12, B   KNIGHT=22
+       W   BISHOP=13, B   BISHOP=23
+       W     ROOK=14, B     ROOK=24
+       W    QUEEN=15, B    QUEEN=25
+       W     KING=16, B     KING=26
+    */
+
+
+    for(int i=1; i<=8; i++) //pioni si culoare
+        a[2][i]=21;
+    for(int i=1; i<=8; i++)
+        a[7][i]=11;
+
+
+    a[1][1]=24,a[1][8]=24,a[8][1]=14,a[8][8]=14; //ture
+    a[1][2]=22,a[1][7]=22,a[8][2]=12,a[8][7]=12; //cai
+    a[1][3]=23,a[1][6]=23,a[8][3]=13,a[8][6]=13; //nebuni
+    a[1][4]=25,a[8][4]=15;                       //regine
+    a[1][5]=26,a[8][5]=16;                       //regi
+}
+
+
+int PatratelAtacat(int c,int b,int p)
+{
+    int s=0;
+    p/=10;
+    if(p==1) p++;
+    else p--;
+    s+=OaspeteleCal(c,b,p*10+2);
+    s+=OaspeteleNebun(c,b,p*10+3);
+    s+=OaspeteleNebun(c,b,p*10+5);
+    s+=OaspeteleTura(c,b,p*10+4);
+    s+=OaspeteleTura(c,b,p*10+5);
+    s+=OaspeteleRege(c,b,p*10+6);
+    memset(Memorare, 0, strlen(Memorare));
+    if(p==2)
+        if(a[c-1][b-1]==21 || a[c-1][b+1]==21)
+            s++;
+    if(p==1)
+        if(a[c+1][b-1]==11 || a[c+1][b+1]==11)
+            s++;
+    return s;
+}
+
+
+
+
+
+
+int Nonsense()
+{
+    char corect[]="NBRQKabcdefgh12345678=+-#Ox";
+    for(int i=0; i<strlen(mutare); i++)
+        if(strchr(corect,mutare[i])==NULL)
+        {
+            cout<<endl<<"  Mutarea contine caractere invalide.";
+            cout<<endl<<"  Introduceti o mutare corecta: ";
+            return 1;
+        }
+    CVSM=PiesaInNr();
+    lungime=strlen(mutare);
+    int x=9-(mutare[lungime-1]-'0');
+    int y=mutare[lungime-2]-'a'+1;
+
+
+    if(a[x][y]/10==Randul)
+    {
+        cout<<endl<<"  Nu puteti captura propria piesa.";
+        cout<<endl<<"  Introduceti o mutare valida: ";
+        return 1;
+    }
+    if(CVSM%10==2)
+    {
+        if(OaspeteleCal(x,y,CVSM)==0)
+        {
+            memset(Memorare, 0, strlen(Memorare));
+            cout<<endl<<"  Niciun cal nu poate ajunge la acest patrat.";
+            cout<<endl<<"  Introduceti o mutare valida: ";
+            return 1;
+        }
+    }
+    else if(CVSM%10==3)
+    {
+        if(OaspeteleNebun(x,y,CVSM)==0)
+        {
+            memset(Memorare, 0, strlen(Memorare));
+            cout<<endl<<"  Niciun nebun nu poate ajunge la acest patrat.";
+            cout<<endl<<"  Introduceti o mutare valida: ";
+            return 1;
+        }
+    }
+    else if(CVSM%10==4)
+    {
+        if(OaspeteleTura(x,y,CVSM)==0)
+        {
+            memset(Memorare, 0, strlen(Memorare));
+            cout<<endl<<"  Nicio tura nu poate ajunge la acest patrat.";
+            cout<<endl<<"  Introduceti o mutare valida: ";
+            return 1;
+        }
+    }
+    else if(CVSM%10==5)
+    {
+        if(OaspeteleTura(x,y,CVSM)+OaspeteleNebun(x,y,CVSM)==0)
+        {
+            memset(Memorare, 0, strlen(Memorare));
+            cout<<endl<<"  Nicio regina nu poate ajunge la acest patrat.";
+            cout<<endl<<"  Introduceti o mutare valida: ";
+            return 1;
+        }
+    }
+    else if(CVSM%10==6)
+    {
+        if(OaspeteleRege(x,y,CVSM)==0)
+        {
+            memset(Memorare, 0, strlen(Memorare));
+            cout<<endl<<"  Regele nu poate ajunge la acest patrat.";
+            cout<<endl<<"  Introduceti o mutare valida: ";
+            return 1;
+        }
+        if(PatratelAtacat(x,y,Randul*10+6)!=0)
+        {
+            cout<<endl<<"  Acest patrat este atacat.";
+            cout<<endl<<"  Introduceti o mutare valida: ";
+            return 1;
+        }
+    }
+    else if(CVSM%10==7)
+    {
+
+
+        if(strchr(mutare,'x')!=NULL)
+        {
+            if(Randul==1)
+                if(a[2][mutare[0]-'a'+1]!=11)
+                {
+                    cout<<endl<<"  Niciun pion nu poate ajunge la acest patrat.";
+                    cout<<endl<<"  Introduceti o mutare valida: ";
+                    return 1;
+                }
+            if(Randul==2)
+                if(a[7][mutare[0]-'a'+1]!=21)
+                {
+                    cout<<endl<<"  Niciun pion nu poate ajunge la acest patrat.";
+                    cout<<endl<<"  Introduceti o mutare valida: ";
+                    return 1;
+                }
+            if(mutare[0]==mutare[2])
+            {
+                cout<<endl<<"  Pionul nu poate captura in fata.";
+                cout<<endl<<"  Introduceti o mutare valida: ";
+                return 1;
+            }
+        }
+        else
+        {
+            if(Randul==1)
+            {
+                if(a[1][mutare[0]-'a'+1]!=0 ||a[2][mutare[0]-'a'+1]!=11)
+                {
+                    cout<<endl<<"  Niciun pion nu poate ajunge la acest patrat.";
+                    cout<<endl<<"  Introduceti o mutare valida: ";
+                    return 1;
+                }
+            }
+            if(Randul==2)
+            {
+                if(a[8][mutare[0]-'a'+1]!=0 ||a[7][mutare[0]-'a'+1]!=21)
+                {
+                    cout<<endl<<"  Niciun pion nu poate ajunge la acest patrat.";
+                    cout<<endl<<"  Introduceti o mutare valida: ";
+                    return 1;
+                }
+            }
+        }
+    }
+    else if(CVSM%10==1)
+    {
+        if(x==8||x==1)
+        {
+            cout<<endl<<"  Cand un pion ajunge la linia finala, acesta trebuie obligatoriu sa promoveze.";
+            cout<<endl<<"  Introduceti o mutare valida: ";
+            return 1;
+        }
+        if(strchr(mutare,'x')!=NULL)
+        {
+            if(a[x][y]%10==0)
+            {
+                cout<<endl<<"  Niciun pion nu poate ajunge la acest patrat.";
+                cout<<endl<<"  Introduceti o mutare valida: ";
+                return 1;
+            }
+            else if(a[x][y]/10==Randul)
+            {
+                cout<<endl<<"  Nu puteti captura propria piesa.";
+                cout<<endl<<"  Introduceti o mutare valida: ";
+                return 1;
+            }
+            if(Randul==1)
+                if(a[10-(mutare[3]-'0')][mutare[0]-'a'+1]!=11)
+                {
+                    cout<<endl<<"  Niciun pion nu poate ajunge la acest patrat.";
+                    cout<<endl<<"  Introduceti o mutare valida: ";
+                    return 1;
+                }
+            if(Randul==2)
+                if(a[8-(mutare[3]-'0')][mutare[0]-'a'+1]!=21)
+                {
+                    cout<<endl<<"  Niciun pion nu poate ajunge la acest patrat.";
+                    cout<<endl<<"  Introduceti o mutare valida: ";
+                    return 1;
+                }
+            if(mutare[0]==mutare[2])
+            {
+                cout<<endl<<"  Pionul nu poate captura in fata.";
+                cout<<endl<<"  Introduceti o mutare valida: ";
+                return 1;
+            }
+            if(abs(mutare[0]-mutare[2])!=1)
+            {
+                cout<<endl<<"  Aceasta mutare nu este posibila.";
+                cout<<endl<<"  Introduceti o mutare valida: ";
+                return 1;
+            }
+        }
+        else
+        {
+            if(a[x][y]!=0)
+            {
+                cout<<endl<<"  Acel patrat e ocupat deja.";
+                cout<<endl<<"  Introduceti o mutare valida: ";
+                return 1;
+            }
+            if(Randul==1)
+            {
+
+
+                if(a[x+1][y]==0)
+                    if(x!=5||a[7][y]!=11)
+                    {
+                        cout<<endl<<"  Niciun pion nu poate ajunge la acest patrat.";
+                        cout<<endl<<"  Introduceti o mutare valida: ";
+                        return 1;
+                    }
+            }
+            if(Randul==2)
+            {
+
+
+                if(a[x-1][y]==0)
+                    if(x!=4||a[2][y]!=21)
+                    {
+                        cout<<endl<<"  Niciun pion nu poate ajunge la acest patrat.";
+                        cout<<endl<<"  Introduceti o mutare valida: ";
+                        return 1;
+                    }
+            }
+        }
+    }
+
+
+    else if(CVSM%10==8)
+    {
+        if(Randul==1)
+        {
+            if(mKa==1)
+            {
+                cout<<endl<<"  Rocada nu este posibila deoarece regele a fost mutat.";
+                cout<<endl<<"  Introduceti o mutare valida: ";
+                return 1;
+            }
+            if(strlen(mutare)==3)
+            {
+                if(a[8][6]!=0||a[8][7]!=0)
+                {
+                    cout<<endl<<"  Rocada nu este posibila cand patratele dinte rege si tura sunt ocupate de piese.";
+                    cout<<endl<<"  Introduceti o mutare valida: ";
+                    return 1;
+                }
+                if(mRDa==1)
+                {
+                    cout<<endl<<"  Rocada nu este posibila deoarece aceasta tura a fost mutata/capturata.";
+                    cout<<endl<<"  Introduceti o mutare valida: ";
+                    return 1;
+                }
+                if(PatratelAtacat(8,5,16)!=0 ||PatratelAtacat(8,6,16)!=0 ||PatratelAtacat(8,7,16)!=0)
+                {
+                    cout<<endl<<"  Rocada nu este posibila cand regele se afla in check sau va fi in check in timpul sau dupa rocada.";
+                    cout<<endl<<"  Introduceti o mutare valida: ";
+                    return 1;
+                }
+            }
+            if(strlen(mutare)==5)
+            {
+                if(a[8][4]!=0||a[8][3]!=0||a[8][2]!=0)
+                {
+                    cout<<endl<<"  Rocada nu este posibila cand patratele dinte rege si tura sunt ocupate de piese.";
+                    cout<<endl<<"  Introduceti o mutare valida: ";
+                    return 1;
+                }
+                if(mRSa==1)
+                {
+                    cout<<endl<<"  Rocada nu este posibila deoarece aceasta tura a fost mutata/capturata.";
+                    cout<<endl<<"  Introduceti o mutare valida: ";
+                    return 1;
+                }
+                if(PatratelAtacat(8,5,16)!=0 ||PatratelAtacat(8,4,16)!=0 ||PatratelAtacat(8,3,16)!=0 ||PatratelAtacat(8,2,16)!=0)
+                {
+                    cout<<endl<<"  Rocada nu este posibila cand regele se afla in check sau va fi in check in timpul sau dupa rocada.";
+                    cout<<endl<<"  Introduceti o mutare valida: ";
+                    return 1;
+                }
+            }
+        }
+        if(Randul==2)
+        {
+            if(mKn==1)
+            {
+                cout<<endl<<"  Rocada nu este posibila deoarece regele a fost mutat.";
+                cout<<endl<<"  Introduceti o mutare valida: ";
+                return 1;
+            }
+            if(strlen(mutare)==3)
+            {
+                if(a[1][6]!=0||a[1][7]!=0)
+                {
+                    cout<<endl<<"  Rocada nu este posibila cand patratele dinte rege si tura sunt ocupate de piese.";
+                    cout<<endl<<"  Introduceti o mutare valida: ";
+                    return 1;
+                }
+                if(mRDn==1)
+                {
+                    cout<<endl<<"  Rocada nu este posibila deoarece aceasta tura a fost mutata/capturata.";
+                    cout<<endl<<"  Introduceti o mutare valida: ";
+                    return 1;
+                }
+                if(PatratelAtacat(1,5,26)!=0 ||PatratelAtacat(1,6,26)!=0 ||PatratelAtacat(1,7,26)!=0)
+                {
+                    cout<<endl<<"  Rocada nu este posibila cand regele se afla in check sau va fi in check in timpul sau dupa rocada.";
+                    cout<<endl<<"  Introduceti o mutare valida: ";
+                    return 1;
+                }
+            }
+            if(strlen(mutare)==5)
+            {
+                if(a[1][4]!=0||a[1][3]!=0||a[1][2]!=0)
+                {
+                    cout<<endl<<"  Rocada nu este posibila cand patratele dinte rege si tura sunt ocupate de piese.";
+                    cout<<endl<<"  Introduceti o mutare valida: ";
+                    return 1;
+                }
+                if(mRSn==1)
+                {
+                    cout<<endl<<"  Rocada nu este posibila deoarece aceasta tura a fost mutata/capturata.";
+                    cout<<endl<<"  Introduceti o mutare valida: ";
+                    return 1;
+                }
+                if(PatratelAtacat(1,5,26)!=0 ||PatratelAtacat(1,4,26)!=0 ||PatratelAtacat(1,3,26)!=0 ||PatratelAtacat(1,2,26)!=0)
+                {
+                    cout<<endl<<"  Rocada nu este posibila cand regele se afla in check sau va fi in check in timpul sau dupa rocada.";
+                    cout<<endl<<"  Introduceti o mutare valida: ";
+                    return 1;
+                }
+            }
+        }
+
+
+
+
+    }
+    if(CVSM%10==7)
+    {
+        x=9-(mutare[lungime-3]-'0');
+        y=mutare[lungime-4]-'a'+1;
+        if(PiesaPinned(x,y)==1)
+        {
+            cout<<endl<<"  Piesa e legata. Mutand-o astfel, regele poate fi capturat.";
+            cout<<endl<<"  Introduceti o mutare valida: ";
+            return 1;
+        }
+    }
+    if(CVSM%10!=6& CVSM%10!=7 & CVSM%10!=8)
+        if(PiesaPinned(x,y)==1)
+        {
+            cout<<endl<<"  Piesa e legata. Mutand-o astfel, regele poate fi capturat.";
+            cout<<endl<<"  Introduceti o mutare valida: ";
+            return 1;
+        }
+
+
+    return 0;
+}
+
+
+
+
+int Checks;
+int PiesaPinned(int c, int b)
+{
+    MutariImpartire();
+    UndeMiRegele(Randul*10+6); ///daca regele meu e in Check dupa mutarea mea
+    Checks=PatratelAtacat(xK,yK,Randul*10+6);
+    for(int i=1; i<=8; i++)
+        for(int j=1; j<=8; j++)
+            a[i][j]=mat[i][j];
+    if(Checks>0)
+        return 1;
+    return 0;
+}
+
+
+
+
+void ScapideCheck()
+{
+    CitireMutare();
+    MutariImpartire();
+    FaMutarea();
+    UndeMiRegele(Randul*10+6); ///daca regele meu e inca in Check
+    Checks=PatratelAtacat(xK,yK,Randul*10+6);
+    if(Checks!=0)
+    {
+        for(int i=1; i<=8; i++)
+            for(int j=1; j<=8; j++)
+                a[i][j]=mat[i][j];
+        cout<<endl<<"  Regele e inca in check.";
+        cout<<endl<<"  Introduceti o mutare valida: ";
+        ScapideCheck();
+    }
+
+
+
+
+}
+
+
+int ReverseOaspeteleCal(int c, int b)
+{
+    UndeMiRegele(Randul*10+6);
+    int CatiCai=0,e=c,d=b,r=0;
+    c-=2,b--;
+    if(c>0&c<9 & b>0&b<9)
+        if(a[c][b]/10!=Randul)
+        {
+            r=a[c][b];
+            CatiCai++,a[e][d]=0,a[c][b]=Randul*10+2;
+            if(PatratelAtacat(xK,yK,Randul*10+6)!=0)
+                CatiCai--;
+            a[e][d]=Randul*10+2,a[c][b]=r;
+        }
+    b+=2;
+    if(c>0&c<9 & b>0&b<9)
+        if(a[c][b]/10!=Randul)
+        {
+            r=a[c][b];
+            CatiCai++,a[e][d]=0,a[c][b]=Randul*10+2;
+            if(PatratelAtacat(xK,yK,Randul*10+6)!=0)
+                CatiCai--;
+            a[e][d]=Randul*10+2,a[c][b]=r;
+        }
+    c++,b++;
+    if(c>0&c<9 & b>0&b<9)
+        if(a[c][b]/10!=Randul)
+        {
+            r=a[c][b];
+            CatiCai++,a[e][d]=0,a[c][b]=Randul*10+2;
+            if(PatratelAtacat(xK,yK,Randul*10+6)!=0)
+                CatiCai--;
+            a[e][d]=Randul*10+2,a[c][b]=r;
+        }
+    c+=2;
+    if(c>0&c<9 & b>0&b<9)
+        if(a[c][b]/10!=Randul)
+        {
+            r=a[c][b];
+            CatiCai++,a[e][d]=0,a[c][b]=Randul*10+2;
+            if(PatratelAtacat(xK,yK,Randul*10+6)!=0)
+                CatiCai--;
+            a[e][d]=Randul*10+2,a[c][b]=r;
+        }
+    c++,b--;
+    if(c>0&c<9 & b>0&b<9)
+        if(a[c][b]/10!=Randul)
+        {
+            r=a[c][b];
+            CatiCai++,a[e][d]=0,a[c][b]=Randul*10+2;
+            if(PatratelAtacat(xK,yK,Randul*10+6)!=0)
+                CatiCai--;
+            a[e][d]=Randul*10+2,a[c][b]=r;
+        }
+    b-=2;
+    if(c>0&c<9 & b>0&b<9)
+        if(a[c][b]/10!=Randul)
+        {
+            r=a[c][b];
+            CatiCai++,a[e][d]=0,a[c][b]=Randul*10+2;
+            if(PatratelAtacat(xK,yK,Randul*10+6)!=0)
+                CatiCai--;
+            a[e][d]=Randul*10+2,a[c][b]=r;
+        }
+    c--,b--;
+    if(c>0&c<9 & b>0&b<9)
+        if(a[c][b]/10!=Randul)
+        {
+            r=a[c][b];
+            CatiCai++,a[e][d]=0,a[c][b]=Randul*10+2;
+            if(PatratelAtacat(xK,yK,Randul*10+6)!=0)
+                CatiCai--;
+            a[e][d]=Randul*10+2,a[c][b]=r;
+        }
+    c-=2;
+    if(c>0&c<9 & b>0&b<9)
+        if(a[c][b]/10!=Randul)
+        {
+            r=a[c][b];
+            CatiCai++,a[e][d]=0,a[c][b]=Randul*10+2;
+            if(PatratelAtacat(xK,yK,Randul*10+6)!=0)
+                CatiCai--;
+            a[e][d]=Randul*10+2,a[c][b]=r;
+        }
+
+
+    return CatiCai;
+}
+
+
+int ReverseOaspeteleNebun(int c, int b, int f)
+{
+    int CatiNebuni=0,e=c,d=b,r;
+    UndeMiRegele(Randul*10+6);
+    c--,b--;
+    while(a[c][b]==0 && c>1 && b>1)
+    {
+        r=a[c][b];
+        a[e][d]=0,a[c][b]=Randul*10+f;
+        if(PatratelAtacat(xK,yK,Randul*10+6)==0 & c>0&c<9 &b<9&b>0)
+            CatiNebuni++;
+        a[e][d]=Randul*10+f,a[c][b]=r;
+        c--,b--;
+    }
+    if(a[c][b]/10!=Randul )
+    {
+        r=a[c][b];
+        a[e][d]=0,a[c][b]=Randul*10+f;
+        if(PatratelAtacat(xK,yK,Randul*10+6)==0& c>0&c<9 &b<9&b>0)
+            CatiNebuni++;
+        a[e][d]=Randul*10+f,a[c][b]=r;
+    }
+    c=e,b=d;
+
+
+    c--,b++;
+    while(a[c][b]==0 && c>1 && b<8)
+    {
+        r=a[c][b];
+        a[e][d]=0,a[c][b]=Randul*10+f;
+        if(PatratelAtacat(xK,yK,Randul*10+6)==0 & c>0&c<9 &b<9&b>0)
+            CatiNebuni++;
+        a[e][d]=Randul*10+f,a[c][b]=r;
+        c--,b++;
+    }
+    if(a[c][b]/10!=Randul )
+    {
+        r=a[c][b];
+        a[e][d]=0,a[c][b]=Randul*10+f;
+        if(PatratelAtacat(xK,yK,Randul*10+6)==0& c>0&c<9 &b<9&b>0)
+            CatiNebuni++;
+        a[e][d]=Randul*10+f,a[c][b]=r;
+    }
+    c=e,b=d;
+
+
+    c++,b--;
+    while(a[c][b]==0 && c<8 && b>1)
+    {
+        r=a[c][b];
+        a[e][d]=0,a[c][b]=Randul*10+f;
+        if(PatratelAtacat(xK,yK,Randul*10+6)==0 & c>0&c<9 &b<9&b>0)
+            CatiNebuni++;
+        a[e][d]=Randul*10+f,a[c][b]=r;
+        c++,b--;
+    }
+    if(a[c][b]/10!=Randul )
+    {
+        r=a[c][b];
+        a[e][d]=0,a[c][b]=Randul*10+f;
+        if(PatratelAtacat(xK,yK,Randul*10+6)==0& c>0&c<9 &b<9&b>0)
+            CatiNebuni++;
+        a[e][d]=Randul*10+f,a[c][b]=r;
+    }
+    c=e,b=d;
+
+
+    c++,b++;
+    while(a[c][b]==0 && c<8 && b<8)
+    {
+        r=a[c][b];
+        a[e][d]=0,a[c][b]=Randul*10+f;
+        if(PatratelAtacat(xK,yK,Randul*10+6)==0 & c>0&c<9 &b<9&b>0)
+            CatiNebuni++;
+        a[e][d]=Randul*10+f,a[c][b]=r;
+        c++,b++;
+    }
+    if(a[c][b]/10!=Randul )
+    {
+        r=a[c][b];
+        a[e][d]=0,a[c][b]=Randul*10+f;
+        if(PatratelAtacat(xK,yK,Randul*10+6)==0& c>0&c<9 &b<9&b>0)
+            CatiNebuni++;
+        a[e][d]=Randul*10+f,a[c][b]=r;
+    }
+    c=e,b=d;
+
+
+    return CatiNebuni;
+}
+
+
+int ReverseOaspeteleTura(int c, int b, int f)
+{
+    int CateTure=0,e=c,d=b,r;
+    UndeMiRegele(Randul*10+6);
+    c--;
+    while(a[c][b]==0 && c>1)
+    {
+        r=a[c][b];
+        a[e][d]=0,a[c][b]=Randul*10+f;
+        if(PatratelAtacat(xK,yK,Randul*10+6)==0 & b>0&b<9 & c>0&c<9)
+            CateTure++;
+        a[e][d]=Randul*10+f,a[c][b]=r;
+        c--;
+    }
+    if(a[c][b]/10!=Randul )
+    {
+        r=a[c][b];
+        a[e][d]=0,a[c][b]=Randul*10+f;
+        if(PatratelAtacat(xK,yK,Randul*10+6)==0 & b>0&b<9 & c>0&c<9)
+            CateTure++;
+        a[e][d]=Randul*10+f,a[c][b]=r;
+    }
+    c=e,b=d;
+
+
+    b--;
+    while(a[c][b]==0 && b>1)
+    {
+        r=a[c][b];
+        a[e][d]=0,a[c][b]=Randul*10+f;
+        if(PatratelAtacat(xK,yK,Randul*10+6)==0 & b>0&b<9 & c>0&c<9)
+            CateTure++;
+        a[e][d]=Randul*10+f,a[c][b]=r;
+        b--;
+    }
+    if(a[c][b]/10!=Randul & c!=e &b!=d)
+    {
+        r=a[c][b];
+        a[e][d]=0,a[c][b]=Randul*10+f;
+        if(PatratelAtacat(xK,yK,Randul*10+6)==0 & b>0&b<9 & c>0&c<9)
+            CateTure++;
+        a[e][d]=Randul*10+f,a[c][b]=r;
+    }
+    c=e,b=d;
+
+
+    b++;
+    while(a[c][b]==0 && b<8)
+    {
+        r=a[c][b];
+        a[e][d]=0,a[c][b]=Randul*10+f;
+        if(PatratelAtacat(xK,yK,Randul*10+6)==0 & b>0&b<9 & c>0&c<9)
+            CateTure++;
+        a[e][d]=Randul*10+f,a[c][b]=r;
+        b++;
+    }
+    if(a[c][b]/10!=Randul)
+    {
+        r=a[c][b];
+        a[e][d]=0,a[c][b]=Randul*10+f;
+        if(PatratelAtacat(xK,yK,Randul*10+6)==0 & b>0&b<9 & c>0&c<9)
+            CateTure++;
+        a[e][d]=Randul*10+f,a[c][b]=r;
+    }
+    c=e,b=d;
+
+
+    c++;
+    while(a[c][b]==0 && c<8)
+    {
+        r=a[c][b];
+        a[e][d]=0,a[c][b]=Randul*10+f;
+        if(PatratelAtacat(xK,yK,Randul*10+6)==0 & b>0&b<9 & c>0&c<9)
+            CateTure++;
+        a[e][d]=Randul*10+f,a[c][b]=r;
+        c++;
+    }
+    if(a[c][b]/10!=Randul)
+    {
+        r=a[c][b];
+        a[e][d]=0,a[c][b]=Randul*10+f;
+        if(PatratelAtacat(xK,yK,Randul*10+6)==0 & b>0&b<9 & c>0&c<9)
+            CateTure++;
+        a[e][d]=Randul*10+f,a[c][b]=r;
+    }
+
+
+    return CateTure;
+}
+
+
+int ReverseOaspeteleRege(int c,int b)
+{
+    int CatiRegi=0;
+    c--;
+    if(c>0&c<9 & b>0&b<9)
+        if(a[c][b]/10!=Randul)
+        {
+            CatiRegi++;
+            if(PatratelAtacat(c,b,Randul*10+6)!=0)
+                CatiRegi--;
+        }
+    b++;
+    if(c>0&c<9 & b>0&b<9)
+        if(a[c][b]/10!=Randul)
+        {
+            CatiRegi++;
+            if(PatratelAtacat(c,b,Randul*10+6)!=0)
+                CatiRegi--;
+        }
+    c++;
+    if(c>0&c<9 & b>0&b<9)
+        if(a[c][b]/10!=Randul)
+        {
+            CatiRegi++;
+            if(PatratelAtacat(c,b,Randul*10+6)!=0)
+                CatiRegi--;
+        }
+    c++;
+    if(c>0&c<9 & b>0&b<9)
+        if(a[c][b]/10!=Randul)
+        {
+            CatiRegi++;
+            if(PatratelAtacat(c,b,Randul*10+6)!=0)
+                CatiRegi--;
+        }
+    b--;
+    if(c>0&c<9 & b>0&b<9)
+        if(a[c][b]/10!=Randul)
+        {
+            CatiRegi++;
+            if(PatratelAtacat(c,b,Randul*10+6)!=0)
+                CatiRegi--;
+        }
+    b--;
+    if(c>0&c<9 & b>0&b<9)
+        if(a[c][b]/10!=Randul)
+        {
+            CatiRegi++;
+            if(PatratelAtacat(c,b,Randul*10+6)!=0)
+                CatiRegi--;
+        }
+    c--;
+    if(c>0&c<9 & b>0&b<9)
+        if(a[c][b]/10!=Randul)
+        {
+            CatiRegi++;
+            if(PatratelAtacat(c,b,Randul*10+6)!=0)
+                CatiRegi--;
+        }
+    c--;
+    if(c>0&c<9 & b>0&b<9)
+        if(a[c][b]/10!=Randul)
+        {
+            CatiRegi++;
+            if(PatratelAtacat(c,b,Randul*10+6)!=0)
+                CatiRegi--;
+        }
+    return CatiRegi;
+}
+
+
+int ReversePion(int c,int b)
+{
+    UndeMiRegele(Randul*10+6);
+    int CatiPioni=0,e=c,d=b,r;
+    if(Randul==1)
+    {
+        if(a[c-1][b]==0)
+        {
+
+
+            r=a[c-1][b];
+            a[e][d]=0,a[c-1][b]=Randul*10+1;
+            if(PatratelAtacat(xK,yK,Randul*10+6)==0 & b>0&b<9 & c>0&c<9)
+                CatiPioni++;
+            a[e][d]=Randul*10+1,a[c-1][b]=r;
+
+
+            if(a[c-2][b]==0& c==7)
+            {
+                r=a[c-2][b];
+                a[e][d]=0,a[c-2][b]=Randul*10+1;
+                if(PatratelAtacat(xK,yK,Randul*10+6)==0 & b>0&b<9 & c>0&c<9)
+                    CatiPioni++;
+                a[e][d]=Randul*10+1,a[c-2][b]=r;
+            }
+        }
+        if(b>1&b<8)
+        {
+            if(a[c-1][b-1]/10==Schimb1)
+            {
+                r=a[c-1][b-1];
+                a[e][d]=0,a[c-1][b-1]=Randul*10+1;
+                if(PatratelAtacat(xK,yK,Randul*10+6)==0 & b>0&b<9 & c>0&c<9)
+                    CatiPioni++;
+                a[e][d]=Randul*10+1,a[c-1][b-1]=r;
+            }
+            if(a[c-1][b+1]/10==Schimb1)
+            {
+                r=a[c-1][b+1];
+                a[e][d]=0,a[c-1][b+1]=Randul*10+1;
+                if(PatratelAtacat(xK,yK,Randul*10+6)==0 & b>0&b<9 & c>0&c<9)
+                    CatiPioni++;
+                a[e][d]=Randul*10+1,a[c-1][b+1]=r;
+            }
+        }
+    }
+    if(Randul==2)
+    {
+        if(a[c+1][b]==0)
+        {
+            r=a[c+1][b];
+            a[e][d]=0,a[c+1][b]=Randul*10+1;
+            if(PatratelAtacat(xK,yK,Randul*10+6)==0 & b>0&b<9 & c>0&c<9)
+                CatiPioni++;
+            a[e][d]=Randul*10+1,a[c+1][b]=r;
+            if(a[c+2][b]==0& c==2)
+            {
+                r=a[c+2][b];
+                a[e][d]=0,a[c+2][b]=Randul*10+1;
+                if(PatratelAtacat(xK,yK,Randul*10+6)==0 & b>0&b<9 & c>0&c<9)
+                    CatiPioni++;
+                a[e][d]=Randul*10+1,a[c+2][b]=r;
+            }
+        }
+        if(b>1&b<8)
+        {
+            if(a[c+1][b+1]/10==Schimb1)
+            {
+                r=a[c+1][b+1];
+            a[e][d]=0,a[c+1][b+1]=Randul*10+1;
+            if(PatratelAtacat(xK,yK,Randul*10+6)==0 & b>0&b<9 & c>0&c<9)
+                CatiPioni++;
+            a[e][d]=Randul*10+1,a[c+1][b+1]=r;
+            }
+            if(a[c+1][b-1]/10==Schimb1)
+            {
+                r=a[c+1][b-1];
+                a[e][d]=0,a[c+1][b-1]=Randul*10+1;
+                if(PatratelAtacat(xK,yK,Randul*10+6)==0 & b>0&b<9 & c>0&c<9)
+                    CatiPioni++;
+                a[e][d]=Randul*10+1,a[c+1][b-1]=r;
+            }
+        }
+    }
+   return CatiPioni;
+}
+int NumaratorulDeMutari()
+{
+    swap(Randul,Schimb1);
+    int s=0;
+    for(int i=1; i<=8; i++)
+        for(int j=1; j<=8; j++)
+            if(a[i][j]/10==Randul)
+            {
+                if(a[i][j]%10==1)
+                    s+=ReversePion(i,j);
+                if(a[i][j]%10==2)
+                    s+=ReverseOaspeteleCal(i,j);
+                if(a[i][j]%10==3)
+                    s+=ReverseOaspeteleNebun(i,j,3);
+                if(a[i][j]%10==4)
+                    s+=ReverseOaspeteleTura(i,j,4);
+                if(a[i][j]%10==5)
+                    s+=ReverseOaspeteleNebun(i,j,5),s+=ReverseOaspeteleTura(i,j,5);
+                if(a[i][j]%10==6)
+                    s+=ReverseOaspeteleRege(i,j);
+            }
+            swap(Randul,Schimb1);
+    return s;
+
+
+
+
+}
+
+
+
+
+
+
+void CitireMutare()
+{
+    cin>>mutare;
+    PrelucrareMutare();
+    if(Nonsense()==1)
+        CitireMutare();
+}
+
+
+int op=0;
+void JocNou()
+{
+    system("cls");
+    NumeleVoastre();
+    system("cls");
+    InitializareTabla();
+
+
+    while(SahMat==false)
+    {
+        for(int i=1; i<=8; i++)
+            for(int j=1; j<=8; j++)
+                mat[i][j]=a[i][j];
+        AfisareTabla();
+        cout<<endl<<endl;
+        AfisareMutari();
+        cout<<endl<<endl;
+        EsteRandul();
+        if(Checks!=0)
+            ScapideCheck();
+        else CitireMutare();
+        system("cls");
+        MutariImpartire();
+        AdaugareMutari();
+
+
+        UndeMiRegele(Schimb1*10+6); ///daca regele inamic e in Check
+        Checks=PatratelAtacat(xK,yK,Schimb1*10+6);
+        op=NumaratorulDeMutari(); //probabil cea mai grea functie pe care am scris-o in viata mea
+        if(op==0)
+        {
+            system("cls");
+            SahMat=true;
+            if(Checks>0)
+            {
+                MutarileFacute[croco-1]='#',MutarileFacute[croco]=' ',croco++;
+                system("cls");
+                if(Randul==2)
+                    cout<<endl<<"                      Negru castiga!"<<endl;
+                if(Randul==1)
+                    cout<<endl<<"                        Alb castiga!"<<endl;
+
+
+                AfisareTabla();
+                cout<<endl<<endl;
+                AfisareMutari();
+                cout<<endl<<endl;
+            }
+            if(Checks==0)
+            {
+                cout<<"   Pat!(Stalemate) Partida se incheie cu egalitate.";
+            }
+            break;
+        }
+        if(Checks>0)
+            MutarileFacute[croco-1]='+',MutarileFacute[croco]=' ',croco++;
+    }
+}
+
+
+
+
+void Credite()
+{
+    system("cls");
+    cout<<endl<<"    Credite"<<endl<<endl;
+    cout<<"    Andrei"<<endl;
+    cout<<"    Chess.com --> m-au invatat notatiile de sah"<<endl;
+    cout<<"    Edi --> cateva sfaturi";
+    for(int i=1; i<=7; i++)
+        cout<<endl;
+    cout<<" Apasati Enter pentru a va intoarce.";
+    getch();
+    system("cls");
+    Start();
+}
+
+
+
+
+void Reguli()
+{
+    system("cls");
+    cout<<endl<<endl<<"   Bine ati venit la cursul meu de sah!"<<endl;
+    cout<<"   Aici veti invata cum se muta piesele si cum se noteaza mutarile!";
+    cout<<endl<<endl<<endl<<"   Sa incepem!";
+    getch();
+    system("cls");
+    cout<<endl<<endl<<"   Asa arata tabla de sah."<<endl;
+    strcpy(NumeAlb,"Alb"); strcpy(NumeNegru,"Negru");
+    AfisareTabla();
+    cout<<endl<<endl<<"   Coloanele sunt notate cu litere mici, de la a la h, iar liniile cu cifre, de la 1 la 8.";
+    getch();
+    system("cls");
+    a[4][6]=70;
+    cout<<endl<<endl<<"   Am marcat patratul de coordonatele f5."<<endl;
+    AfisareTabla(); cout<<endl;
+    getch();
+    system("cls");
+    a[3][4]=70;
+    cout<<endl<<endl<<"   Iar acum pe cel de coordonate d6."<<endl;
+    AfisareTabla(); cout<<endl;
+    getch();
+    system("cls");
+    a[6][3]=70;
+    cout<<endl<<endl<<"   Va puteti da seama care sunt coordonatele patratului care a fost marcat acum?"<<endl;
+    AfisareTabla(); cout<<endl;
+    cout<<"   Introduceti aici coordonatele lui: "; char mop[10]; cin>>mop;
+    while(mop[0]!='c' || mop[1]!='3' || strlen(mop)>2)
+    cout<<endl<<"   Nu acestea sunt coordonatele corecte. Incercati din nou: ",cin>>mop;
+    cout<<endl<<"   Felicitari! Ai raspuns corect. Sa continuam.";
+    a[4][6]=0;a[3][4]=0;a[6][3]=0;
+    getch();
+    system("cls");
+    cout<<endl<<"   Sa vorbim despre piesele jocului de sah."<<endl<<"   Fiecare piesa are o notatie, pusa inaintea mutarii."<<endl<<endl;
+    cout<<"  Regele se noteaza cu 'K'ing     Regina --> 'Q'ueen"<<endl;
+    cout<<"  Nebun         ---->  'B'ishop   Tura   --> 'R'ook"<<endl;
+    cout<<"  Cal           ----> k'N'ight    iar pionul nu are o notatie, vom lasa spatiu liber."<<endl;
+    cout<<"  Iar pentru reprezentarea culorii vom folosi w(White) sau b(Black)."<<endl<<endl;
+    cout<<"  Fiecare abreviere a unei piese se scrie cu litera majuscula."<<endl<<"  Vom vorbi despre fiecare in parte.";
+    getch();
+    system("cls");
+    cout<<endl<<endl<<"   Ghidandu-ne dupa acest cod, o tabla de sah va arata asa la inceput:"<<endl;
+    InitializareTabla();
+    AfisareTabla();
+    getch();
+    cout<<endl<<endl<<"   Acum vom aborda fiecare tip de piesa in parte.";
+    getch();
+    system("cls");
+    for(int i=1;i<=8;i++)
+        for(int j=1;j<=8;j++)
+        a[i][j]=0;
+    cout<<endl<<"   Sa incepem cu pionul. Pionul poate avansa cate un patratel in fata, atata timp cat calea lui nu este blocata."<<endl;
+    cout<<"   Daca este prima lui mutare, atunci poate avansa 2 patratele."<<endl;
+    cout<<"   Mutarea se noteaza cu patratul pe care pionul aterizeaza.";
+    a[7][5]=11;
+    AfisareTabla();
+    getch();
+    cout<<endl<<"   Pionul se afla pe patratelul e2."; getch();
+    cout<<endl<<"   Vom face mutarea e4.";
+    getch();
+    system("cls");
+    cout<<endl<<"   Sa incepem cu pionul. Pionul poate avansa cate un patratel in fata, atata timp cat calea lui nu este blocata."<<endl;
+    cout<<"   Daca este prima lui mutare, atunci poate avansa 2 patratele."<<endl;
+    cout<<"   Mutarea se noteaza cu patratul pe care pionul aterizeaza.";
+    a[7][5]=0,a[5][5]=11;
+    AfisareTabla();
+    cout<<endl<<"   Pionul se afla pe patratelul e2.";
+    cout<<endl<<"   Vom face mutarea e4."<<endl; getch();
+    cout<<"   Iar acum mutarea e5."<<endl;
+    getch();
+    system("cls");
+    cout<<endl<<"   Sa incepem cu pionul. Pionul poate avansa cate un patratel in fata, atata timp cat calea lui nu este blocata."<<endl;
+    cout<<"   Daca este prima lui mutare, atunci poate avansa 2 patratele."<<endl;
+    cout<<"   Mutarea se noteaza cu patratul pe care pionul aterizeaza.";
+    a[5][5]=0,a[4][5]=11;
+    AfisareTabla();
+    cout<<endl<<"   Pionul se afla pe patratelul e2.";
+    cout<<endl<<"   Vom face mutarea e4."<<endl;
+    cout<<"   Iar acum mutarea e5."<<endl; getch();
+    cout<<"   e6."<<endl; getch();
+    system("cls");
+    cout<<endl<<"   Sa incepem cu pionul. Pionul poate avansa cate un patratel in fata, atata timp cat calea lui nu este blocata."<<endl;
+    cout<<"   Daca este prima lui mutare, atunci poate avansa 2 patratele."<<endl;
+    cout<<"   Mutarea se noteaza cu patratul pe care pionul aterizeaza.";
+    a[4][5]=0,a[3][5]=11;
+    AfisareTabla();
+    cout<<endl<<"   Pionul se afla pe patratelul e2.";
+    cout<<endl<<"   Vom face mutarea e4.";
+    cout<<endl<<"   Iar acum mutarea e5.";
+    cout<<endl<<"   e6."; getch();
+    cout<<endl<<"   e7."; getch();
+    system("cls");
+    cout<<endl<<"   Sa incepem cu pionul. Pionul poate avansa cate un patratel in fata, atata timp cat calea lui nu este blocata."<<endl;
+    cout<<"   Daca este prima lui mutare, atunci poate avansa 2 patratele."<<endl;
+    cout<<"   Mutarea se noteaza cu patratul pe care pionul aterizeaza.";
+    a[3][5]=0,a[2][5]=11;
+    AfisareTabla();
+    cout<<endl<<"   Pionul se afla pe patratelul e2.";
+    cout<<endl<<"   Vom face mutarea e4.";
+    cout<<endl<<"   Iar acum mutarea e5.";
+    cout<<endl<<"   e6.";
+    cout<<endl<<"   e7."; getch();
+    cout<<endl<<"   Iar acum ca pionul nostru va ajunge la ultima linie, acesta va promova in piesa pe care o vrem. De obicei se promoveaza in regina.";
+    cout<<endl<<"   Mutarea va fi e8=Q."; getch();
+    system("cls");
+    cout<<endl<<"   Sa incepem cu pionul. Pionul poate avansa cate un patratel in fata, atata timp cat calea lui nu este blocata."<<endl;
+    cout<<"   Daca este prima lui mutare, atunci poate avansa 2 patratele."<<endl;
+    cout<<"   Mutarea se noteaza cu patratul pe care pionul aterizeaza.";
+    a[2][5]=0,a[1][5]=15;
+    AfisareTabla();
+    cout<<endl<<"   Pionul se afla pe patratelul e2.";
+    cout<<endl<<"   Vom face mutarea e4.";
+    cout<<endl<<"   Iar acum mutarea e5.";
+    cout<<endl<<"   e6.";
+    cout<<endl<<"   e7.";
+    cout<<endl<<"   Iar acum ca pionul nostru va ajunge la ultima linie, acesta va promova in piesa pe care o vrem. De obicei se promoveaza in regina.";
+    cout<<endl<<"   Mutarea va fi e8=Q."; getch();
+    cout<<endl<<"   Felicitari! Ai invatat cum se promoveaza pionii! Sa trecem mai departe."; getch();
+    system("cls");
+    a[1][5]=0,a[6][4]=11,a[5][4]=21,a[5][5]=24,a[5][3]=12;
+    AfisareTabla();  getch();
+    cout<<endl<<endl<<"   Pionul nu poate captura in fata, dar poate captura pe diagonala. Vom captura tura din dreapta sus. Mutarea este dxe4."; getch();
+    system("cls");
+    a[6][4]=0,a[5][5]=11;
+    AfisareTabla();
+    cout<<endl<<endl<<"   Pionul nu poate captura in fata, dar poate captura pe diagonala. Vom captura tura din dreapta sus. Mutarea este dxe4."; getch();
+    cout<<endl<<"   Nu va puteti captura niciodata propriile piese. Sa trecem mai departe."; getch();
+    system("cls");
+    a[5][5]=0,a[5][4]=0,a[5][3]=0,a[4][4]=11,a[2][3]=21;
+    AfisareTabla();
+    cout<<endl<<endl<<"   Aceasta regula nu este la fel de cunoscuta si nu a fost implementata in aplicatie (desi poate fi adaugata in viitor)."; getch();
+    cout<<endl<<"   En Passant permite capturarea unui pion inamic care trece pe langa un pion al dvs. atunci cand acesta avanseaza 2 spatii."; getch();
+    a[2][3]=0,a[4][3]=21;
+    system("cls");
+    AfisareTabla();
+    cout<<endl<<endl<<"   Aceasta regula nu este la fel de cunoscuta si nu a fost implementata in aplicatie (desi poate fi adaugata in viitor).";
+    cout<<endl<<"   En Passant permite capturarea unui pion inamic care trece pe langa un pion al dvs. atunci cand acesta avanseaza 2 spatii."; getch();
+    a[4][3]=0,a[3][3]=11,a[4][4]=0;
+    system("cls");
+    AfisareTabla();
+    cout<<endl<<endl<<"   Aceasta regula nu este la fel de cunoscuta si nu a fost implementata in aplicatie (desi poate fi adaugata in viitor).";
+    cout<<endl<<"   En Passant permite capturarea unui pion inamic care trece pe langa un pion al dvs. atunci cand acesta avanseaza 2 spatii.";
+    cout<<endl<<"   Mutarea se noteaza precum o captura normala (dxc6)."; getch();
+    cout<<endl<<"   Sa trecem la urmatoarea piesa.";
+    system("cls");
+    a[3][3]=0,a[6][4]=12;
+    cout<<endl<<"   Calul 'N' se misca in forma de L. 2 patratele in fata si unul in lateral."<<endl;
+    AfisareTabla();
+    cout<<endl<<"   Calul se afla pe d3. Il vom muta pe e5 folosind Ne5."; getch();
+    a[6][4]=0,a[4][5]=12;
+    system("cls");
+    cout<<endl<<"   Calul 'N' se misca in forma de L. 2 patratele in fata si unul in lateral."<<endl;
+    AfisareTabla();
+    cout<<endl<<"   Calul se afla pe d3. Il vom muta pe e5 folosind Ne5."; getch();
+    cout<<endl<<"   Acum e randul tau sa muti calul. Muta-l la c6."; getch();
+    cout<<endl<<"   Introduceti mutarea corecta: "; cin>>mop;
+    while(mop[0]!='N' || mop[1]!='c' || mop[2]!='6' ||strlen(mop)>3)
+    cout<<endl<<"   Se pare ca nu e bine. Nu uita ca abrevierile se scriu cu majuscula, iar coloanele cu litera mica."<<endl<<"   Incercati din nou: ",cin>>mop;
+    cout<<endl<<"   Felicitari! Ai raspuns corect. Sa continuam."; getch();
+    system("cls");
+    a[4][3]=12,a[5][2]=12;
+    AfisareTabla();
+    cout<<endl<<"   Uneori, mai multe piese de acelasi tip pot ajunge la un patrat. Acestea trebuie diferentiate in notatia lor."; getch();
+    cout<<endl<<"   De obicei se utilizeaza linia sau coloana unica pe care se afla. (Nbd3 , Ncd3, Ned3)"; getch();
+    system("cls");
+    a[7][2]=12,a[8][3]=12,a[8][5]=12,a[7][6]=12,a[5][6]=12;
+    AfisareTabla();
+    cout<<endl<<"   Uneori, mai multe piese de acelasi tip pot ajunge la un patrat. Acestea trebuie diferentiate in notatia lor.";
+    cout<<endl<<"   De obicei se utilizeaza linia sau coloana unica pe care se afla. (Nbd3 , Ncd3, Ned3)"; getch();
+    cout<<endl<<"   Insa in anumite situatii foarte specifice trebuie mentionate si linia si coloana pe care se afla piesa pe care vrem sa o mutam."; getch();
+    cout<<endl<<"   Nc1d3"; getch();
+    a[8][3]=0,a[6][4]=12;
+    system("cls");
+    AfisareTabla();
+    cout<<endl<<"   Uneori, mai multe piese de acelasi tip pot ajunge la un patrat. Acestea trebuie diferentiate in notatia lor.";
+    cout<<endl<<"   De obicei se utilizeaza linia sau coloana unica pe care se afla. (Nbd3 , Ncd3, Ned3)";
+    cout<<endl<<"   Insa in anumite situatii foarte specifice trebuie mentionate si linia si coloana pe care se afla piesa pe care vrem sa o mutam.";
+    cout<<endl<<"   Nc1d3"; getch();
+    system("cls");
+    for(int i=1;i<=8;i++)
+        for(int j=1;j<=8;j++)
+        a[i][j]=0;
+    a[5][4]=13;
+    cout<<endl<<"   Nebunul 'B' se misca pe diagonala, atat timp cat calea lui nu e blocata de o piesa. El nu poate sari peste piese, nici macar daca sunt aliate.";
+    AfisareTabla();
+    cout<<endl<<"   Foloseste mutari valide pentru a-l misca pe tabla: ";
+    Randul=1;
+    CitireMutare();
+
+
+    if(mutare[0]!='B' & strlen(mutare)!=3)
+    {
+        cout<<endl<<"   Aceasta nu este o mutare a nebunului. Foloseste abrevierea 'B'.";
+        CitireMutare();
+    }
+    MutariImpartire();
+    system("cls");
+    cout<<endl<<"   Nebunul 'B' se misca pe diagonala, atat timp cat calea lui nu e blocata de o piesa. El nu poate sari peste piese, nici macar daca sunt aliate.";
+    AfisareTabla();
+    cout<<endl<<"   Foloseste mutari valide pentru a-l misca pe tabla: ";
+    Randul=1;
+    CitireMutare();
+
+
+    if(mutare[0]!='B' & strlen(mutare)!=3)
+    {
+        cout<<endl<<"   Aceasta nu este o mutare a nebunului. Foloseste abrevierea 'B'.";
+        CitireMutare();
+    }
+    MutariImpartire();
+    system("cls");
+    cout<<endl<<"   Nebunul 'B' se misca pe diagonala, atat timp cat calea lui nu e blocata de o piesa. El nu poate sari peste piese, nici macar daca sunt aliate.";
+    AfisareTabla();
+    cout<<endl<<"   Bravo! Ai invatat cum muti nebunul! Sa trecem mai departe.";
+    Randul=2;
+    getch();
+    for(int i=1;i<9;i++)
+        for(int j=1;j<=9;j++)
+        a[i][j]=0;
+    system("cls");
+    cout<<endl<<"   Tura 'R' se misca pe linii drepte."<<endl;
+    a[5][5]=14;
+    AfisareTabla(); getch();
+    cout<<endl<<"   Sa mutam tura folosind Re6."; getch();
+    system("cls");
+    a[5][5]=0,a[3][5]=14;
+    cout<<endl<<"   Tura 'R' se misca pe linii drepte."<<endl;
+    AfisareTabla();
+    cout<<endl<<"   Sa mutam tura folosind Re6."; getch();
+    cout<<endl<<"   Sa incercam Rh6."; getch();
+    system("cls");
+    a[3][5]=0,a[3][8]=14;
+    cout<<endl<<"   Tura 'R' se misca pe linii drepte."<<endl;
+    AfisareTabla();
+    cout<<endl<<"   Sa mutam tura folosind Re6.";
+    cout<<endl<<"   Sa incercam Rh6."; getch();
+    cout<<endl<<"   Iar acum Rb6."; getch();
+    system("cls");
+    a[3][8]=0,a[3][2]=14;
+    cout<<endl<<"   Tura 'R' se misca pe linii drepte."<<endl;
+    AfisareTabla();
+    cout<<endl<<"   Sa mutam tura folosind Re6.";
+    cout<<endl<<"   Sa incercam Rh6.";
+    cout<<endl<<"   Iar acum Rb6."; getch();
+    cout<<endl<<"   Bravo! Ai invatat cum se muta tura! Sa continuam."; getch();
+    a[3][2]=0;
+    system("cls"); a[3][3]=15;
+    cout<<endl<<"   Regina 'Q' se misca si ca tura (linii drepte),si ca nebunul (pe diagonala)."<<endl;
+    AfisareTabla(); getch();
+    cout<<endl<<"   Vom face mutarea Qf3."; getch();
+    a[3][3]=0,a[6][6]=15;
+    system("cls");
+
+
+    while(a[4][2]!=15)
+   {
+    cout<<endl<<"   Regina 'Q' se misca si ca tura (linii drepte),si ca nebunul (pe diagonala)."<<endl;
+    AfisareTabla();
+    cout<<endl<<"   Vom face mutarea Qf3.";
+    cout<<endl<<"   E randul tau sa muti regina. Incearca sa o faci sa ajunga la b5.";
+    cout<<endl<<"   Introdu o mutare:";
+    Randul=1;
+    CitireMutare();
+    if(mutare[0]!='Q' & strlen(mutare)!=3)
+    {
+        cout<<endl<<"   Aceasta nu este o mutare a reginei. Foloseste abrevierea 'Q'.";
+        CitireMutare();
+    }
+     MutariImpartire();
+     Randul=1;
+    system("cls");
+   }
+   cout<<endl<<"   Regina 'Q' se misca si ca tura (linii drepte),si ca nebunul (pe diagonala)."<<endl;
+    AfisareTabla();
+    cout<<endl<<"   Vom face mutarea Qf3.";
+    cout<<endl<<"   E randul tau sa muti regina. Incearca sa o faci sa ajunga la b5.";
+    Randul=1;
+    cout<<endl<<endl<<"   Buna treaba! Ai invatat cum se muta regina. Sa mergem mai departe."; getch();
+    system("cls");
+    for(int i=1;i<9;i++)
+        for(int j=1;j<=9;j++)
+        a[i][j]=0;
+        a[4][5]=16;
+    cout<<endl<<"   Regele 'K' poate ajunge la orice patrat din imediata sa vecinatate, atat timp cat acesta nu este ocupat de o piesa aliata sau atacat de o piesa inamica.";
+    AfisareTabla(); getch();
+    cout<<endl<<"   Vom adauga cateva piese pe tabla."; getch();
+    system("cls");
+        a[2][4]=24,a[6][3]=22,a[7][6]=25;
+    cout<<endl<<"   Regele 'K' poate ajunge la orice patrat din imediata sa vecinatate, atat timp cat acesta nu este ocupat de o piesa aliata sau atacat de o piesa inamica.";
+    AfisareTabla();
+    cout<<endl<<"   Vom adauga cateva piese pe tabla."; getch();
+    cout<<endl<<"   Care este singura mutare valida pentru regele nostru?"; getch();
+    cout<<endl<<"   Introduceti mutarea corecta:",cin>>mop;
+    while(mop[0]!='K' || mop[1]!='e' || mop[2]!='6' ||strlen(mop)>3)
+    cout<<endl<<"   Aceasta nu este mutarea corecta. Adu-ti aminte cum se misca piesele invatate anterior."<<endl<<"   Incercati din nou: ",cin>>mop;
+    cout<<endl<<"   Corect! Ati invatat regulile mutarii regelui. Sa vedem ce se intampla atunci cand regele este atacat."; getch();
+    system("cls");
+    for(int i=1;i<9;i++)
+        for(int j=1;j<=9;j++)
+        a[i][j]=0;
+    a[2][7]=24,a[5][7]=15,a[7][4]=16,a[7][2]=12;
+    AfisareTabla(); getch();
+    cout<<endl<<"   In aceasta pozitie, tura decide sa puna regele in Check cu Rd7."; getch();
+    system("cls");
+    a[2][7]=0,a[2][4]=24;
+    AfisareTabla();
+    cout<<endl<<"   In aceasta pozitie, tura decide sa puna regele in Check cu Rd7."; getch();
+    cout<<endl<<"   Cand regele este atacat de o piesa inamica, se spune ca este in Check, iar jucatorul trebuie neaparat sa raspunda acestei amenintari."; getch();
+    cout<<endl<<"   Exista mai multe modalitati de a scapa de Check."; getch();
+    cout<<endl<<"   In primul rand, putem captura piesa care ne ataca."; getch();
+    system("cls");
+    a[2][4]=15, a[5][7]=0;
+    AfisareTabla();
+    cout<<endl<<"   In aceasta pozitie, tura decide sa puna regele in Check cu Rd7.";
+    cout<<endl<<"   Cand regele este atacat de o piesa inamica, se spune ca este in Check, iar jucatorul trebuie neaparat sa raspunda acestei amenintari.";
+    cout<<endl<<"   Exista mai multe modalitati de a scapa de Check.";
+    cout<<endl<<"   In primul rand, putem captura piesa care ne ataca."; getch();
+    system("cls");
+    a[5][7]=15, a[2][4]=24;
+    AfisareTabla();
+    cout<<endl<<"   In aceasta pozitie, tura decide sa puna regele in Check cu Rd7.";
+    cout<<endl<<"   Cand regele este atacat de o piesa inamica, se spune ca este in Check, iar jucatorul trebuie neaparat sa raspunda acestei amenintari.";
+    cout<<endl<<"   Exista mai multe modalitati de a scapa de Check.";
+    cout<<endl<<"   In primul rand, putem captura piesa care ne ataca."; getch();
+    cout<<endl<<"   Putem sa blocam calea piesei ce ne ataca. (Nu merge si pentru cai, deoarece acestia sar peste piese.)"; getch();
+    system("cls");
+    a[6][4]=12,a[7][2]=0;
+    AfisareTabla();
+    cout<<endl<<"   In aceasta pozitie, tura decide sa puna regele in Check cu Rd7.";
+    cout<<endl<<"   Cand regele este atacat de o piesa inamica, se spune ca este in Check, iar jucatorul trebuie neaparat sa raspunda acestei amenintari.";
+    cout<<endl<<"   Exista mai multe modalitati de a scapa de Check.";
+    cout<<endl<<"   In primul rand, putem captura piesa care ne ataca.";
+    cout<<endl<<"   Putem sa blocam calea piesei ce ne ataca. (Nu merge si pentru cai, deoarece acestia sar peste piese.)"; getch();
+    system("cls");
+    a[6][4]=0,a[7][2]=12;
+    AfisareTabla();
+    cout<<endl<<"   In aceasta pozitie, tura decide sa puna regele in Check cu Rd7.";
+    cout<<endl<<"   Cand regele este atacat de o piesa inamica, se spune ca este in Check, iar jucatorul trebuie neaparat sa raspunda acestei amenintari.";
+    cout<<endl<<"   Exista mai multe modalitati de a scapa de Check.";
+    cout<<endl<<"   In primul rand, putem captura piesa care ne ataca.";
+    cout<<endl<<"   Putem sa blocam calea piesei ce ne ataca. (Nu merge si pentru cai, deoarece acestia sar peste piese.)"; getch();
+    cout<<endl<<"   Sau putem muta regele intr-un patrat in care este in siguranta."; getch();
+    system("cls");
+    a[7][4]=0,a[7][5]=16;
+    AfisareTabla();
+    cout<<endl<<"   In aceasta pozitie, tura decide sa puna regele in Check cu Rd7.";
+    cout<<endl<<"   Cand regele este atacat de o piesa inamica, se spune ca este in Check, iar jucatorul trebuie neaparat sa raspunda acestei amenintari.";
+    cout<<endl<<"   Exista mai multe modalitati de a scapa de Check.";
+    cout<<endl<<"   In primul rand, putem captura piesa care ne ataca.";
+    cout<<endl<<"   Putem sa blocam calea piesei ce ne ataca. (Nu merge si daca Check-ul vine de la un cal, deoarece acestia sar peste piese.)";
+    cout<<endl<<"   Sau putem muta regele intr-un patrat in care este in siguranta."; getch();
+    cout<<endl<<"   Daca va aflati in Check si niciuna din aceste mutari nu functioneaza, inseamna ca este Sah Mat, iar meciul se incheie."; getch();
+    cout<<endl<<"   Acum sa invatam despre rocada."; getch();
+    system("cls");
+    for(int i=1;i<9;i++)
+        for(int j=1;j<=9;j++)
+        a[i][j]=0;
+    a[7][1]=11,a[7][2]=11,a[7][3]=11,a[6][4]=11,a[6][5]=11,a[7][6]=11,a[7][7]=11,a[7][8]=11;
+    a[8][1]=14,a[8][8]=14,a[8][5]=16;
+    AfisareTabla(); getch();
+    cout<<endl<<"   Rocada este o mutare speciala la sah, facuta de rege si de una dintre ture."; getch();
+    cout<<endl<<"   Ca aceasta mutare sa fie valida, regele si tura cu care vrem sa facem rocada trebuie sa nu fi fost mutate pana acum, iar patratele peste care regele trece trebuie sa nu fie atacate."; getch();
+    cout<<endl<<"   Exista rocada mica, notata cu O-O, si rocada mare, notata cu O-O-O."; getch();
+    cout<<endl<<"   Rocada mare arata cam asa:"; getch();
+    system("cls");
+    a[8][5]=0,a[8][3]=16,a[8][4]=14,a[8][1]=0;
+    AfisareTabla();
+    cout<<endl<<"   Rocada este o mutare speciala la sah, facuta de rege si de una dintre ture.";
+    cout<<endl<<"   Ca aceasta mutare sa fie valida, regele si tura cu care vrem sa facem rocada trebuie sa nu fi fost mutate pana acum, iar patratele peste care regele trece trebuie sa nu fie atacate.";
+    cout<<endl<<"   Exista rocada mica, notata cu O-O, si rocada mare, notata cu O-O-O.";
+    cout<<endl<<"   Rocada mare arata cam asa:"; getch();
+    system("cls");
+    a[8][5]=16,a[8][3]=0,a[8][4]=0,a[8][1]=14;
+    AfisareTabla();
+    cout<<endl<<"   Rocada este o mutare speciala la sah, facuta de rege si de una dintre ture.";
+    cout<<endl<<"   Ca aceasta mutare sa fie valida, regele si tura cu care vrem sa facem rocada trebuie sa nu fi fost mutate pana acum, iar patratele peste care regele trece trebuie sa nu fie atacate.";
+    cout<<endl<<"   Exista rocada mica, notata cu O-O, si rocada mare, notata cu O-O-O.";
+    cout<<endl<<"   Rocada mare arata cam asa:"; getch();
+    cout<<endl<<"   Iar rocada mica arata asa:"; getch();
+    system("cls");
+    a[8][5]=0,a[8][7]=16,a[8][6]=14,a[8][8]=0;
+    AfisareTabla();
+    cout<<endl<<"   Rocada este o mutare speciala la sah, facuta de rege si de una dintre ture.";
+    cout<<endl<<"   Ca aceasta mutare sa fie valida, regele si tura cu care vrem sa facem rocada trebuie sa nu fi fost mutate pana acum, iar patratele peste care regele trece trebuie sa nu fie atacate.";
+    cout<<endl<<"   Exista rocada mica, notata cu O-O, si rocada mare, notata cu O-O-O.";
+    cout<<endl<<"   Rocada mare arata cam asa:";
+    cout<<endl<<"   Iar rocada mica arata asa:"; getch();
+    system("cls");
+    a[8][5]=16,a[8][7]=0,a[8][6]=0,a[8][8]=14;
+    AfisareTabla();
+    cout<<endl<<"   Rocada este o mutare speciala la sah, facuta de rege si de una dintre ture.";
+    cout<<endl<<"   Ca aceasta mutare sa fie valida, regele si tura cu care vrem sa facem rocada trebuie sa nu fi fost mutate pana acum, iar patratele peste care regele trece trebuie sa nu fie atacate.";
+    cout<<endl<<"   Exista rocada mica, notata cu O-O, si rocada mare, notata cu O-O-O.";
+    cout<<endl<<"   Rocada mare arata cam asa:";
+    cout<<endl<<"   Iar rocada mica arata asa:"; getch();
+    system("cls");
+    a[5][7]=23;
+    AfisareTabla();
+    cout<<endl<<"   Rocada este o mutare speciala la sah, facuta de rege si de una dintre ture.";
+    cout<<endl<<"   Ca aceasta mutare sa fie valida, regele si tura cu care vrem sa facem rocada trebuie sa nu fi fost mutate pana acum, iar patratele peste care regele trece trebuie sa nu fie atacate.";
+    cout<<endl<<"   Exista rocada mica, notata cu O-O, si rocada mare, notata cu O-O-O.";
+    cout<<endl<<"   Rocada mare arata cam asa:";
+    cout<<endl<<"   Iar rocada mica arata asa:"; getch();
+    cout<<endl<<"   Se pare ca pe g4 a aparut un nebun inamic!"; getch();
+    cout<<endl<<"   Acum, rocada mare nu mai este posibila, deoarece nebunul ataca d1, peste care regele trebuia sa treaca."; getch();
+    system("cls");
+    cout<<endl<<"   Bravo! Se pare ca ai invatat toate mutarile de baza ale sahului!"; getch();
+    cout<<endl<<"   Haide sa incercam un meci acum! Intoarce-te la meniu si sa incepem un joc nou!"; getch();
+    system("cls");
+    for(int i=1;i<9;i++)
+        for(int j=1;j<=9;j++)
+        a[i][j]=0;
+        Randul=2;
+    Start();
+
+
+}
+
+
+
+
+void Start()
+{
+    cout<<endl<<"   Bine ati venit la jocul de sah al lui Andrei!"<<endl<<endl<<endl<<endl;
+    cout<<"           1 -> Joc nou"<<endl;
+    cout<<"           2 -> Tutorial"<<endl;
+    cout<<"           3 -> Credite"<<endl<<endl<<"           ";
+    int n;
+    cin>>n;
+    if(n==1)
+        JocNou();
+    if(n==2)
+        Reguli();
+    if(n==3)
+        Credite();
+}
+
+
+
+
+int main()
+{
+    Start();
+}
