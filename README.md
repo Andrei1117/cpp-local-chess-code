@@ -15,4 +15,5 @@ Cum funcționează codul? El citește pătrățelul la care vreți să mutați, 
 What does the code do? It reads your move input, finds the square you want to move to, for example f3, and the piece you want to move there, for example the rook. The move would be Rf3. The code searches for rooks of the right color on the f line and 3rd column and if there is one that can go there, the move is made. <br> <br>
 Sunteți invitați să încercați și dvs. să jucați. Distracție plăcută! <br>
 You are welcome to try it out yourself. Have fun! <br>
+<br> Runs in GCC/Clang. <br>
 ♟️🐈
