@@ -1,4 +1,5 @@
 ROU & ENG <br>
+A C++ project created for my certification exam (2025). The code can be run to play chess locally using FIDE notation. It includes a move log, an illegal move detector, and a simple tutorial designed to help players understand basic moves. <br>
 <img width="630" height="235" alt="Image" src="https://github.com/user-attachments/assets/0a61d874-a24b-4102-a901-4aabfb14d9a6" /> <br>
 Acesta este meniul care vă întâmpină atunci când rulați codul. Puteți alege opțiunea pe care o doriți tastând 1, 2, respectiv 3 și apăsând Enter. <br>
 This is the interface that welcomes you when you first run the code. You can pick between the options by pressing 1,2 or 3 and Enter.<br>
